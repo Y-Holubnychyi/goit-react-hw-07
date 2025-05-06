@@ -1,8 +1,7 @@
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as yup from "yup";
-import { addContact } from "../../redux/contactsSlice";
-import { nanoid } from "nanoid";
 import { useDispatch } from "react-redux";
+import { addContact } from "../../redux/contactsOps";
 import s from "./ContactForm.module.css";
 
 const addProfileSchema = yup.object({
@@ -22,20 +21,13 @@ const addProfileSchema = yup.object({
 const initialValues = {
   name: "",
   number: "",
-  id: "",
 };
 
 const ContactForm = () => {
   const dispatch = useDispatch();
 
   const onAddProfile = (formData, actions) => {
-    const finalUser = {
-      ...formData,
-      id: nanoid(),
-    };
-
-    dispatch(addContact(finalUser));
-
+    dispatch(addContact(formData));
     actions.resetForm();
   };
 

@@ -1,42 +1,75 @@
-import { createSlice } from "@reduxjs/toolkit";
-import ContactInfo from "../contactListInfo.json";
+import { createSlice, createSelector } from "@reduxjs/toolkit";
+import { fetchContacts, addContact, deleteContact } from "./contactsOps";
+import { selectNameFilter } from "./filtersSlice";
 
-const INITIAL_STATE = {
-  contacts: { items: ContactInfo },
-};
-
-export const contactsSlice = createSlice({
+const contactsSlice = createSlice({
   name: "contacts",
-  initialState: INITIAL_STATE,
-  reducers: {
-    addContact: (state, action) => {
-      const newContact = action.payload;
+  initialState: {
+    items: [],
+    loading: false,
+    error: null,
+  },
+  extraReducers: (builder) => {
+    builder
+      // fetchContacts
+      .addCase(fetchContacts.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchContacts.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+        state.items = action.payload;
+      })
+      .addCase(fetchContacts.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
 
-      if (!newContact.name.trim()) {
-        alert("Name cannot be empty or just spaces!");
-        return;
-      }
+      // addContact
+      .addCase(addContact.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(addContact.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+        state.items.push(action.payload);
+      })
+      .addCase(addContact.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
 
-      const contactExists = state.contacts.items.some(
-        (contact) =>
-          contact.name === newContact.name ||
-          contact.number === newContact.number
-      );
-
-      if (!contactExists) {
-        state.contacts.items.push(newContact);
-      } else {
-        alert("Contact with this name or number already exists!");
-      }
-    },
-    deleteContact: (state, action) => {
-      state.contacts.items = state.contacts.items.filter(
-        (user) => user.id !== action.payload
-      );
-    },
+      // deleteContact
+      .addCase(deleteContact.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(deleteContact.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+        state.items = state.items.filter(
+          (contact) => contact.id !== action.payload.id // id приходит в payload
+        );
+      })
+      .addCase(deleteContact.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
   },
 });
 
-export const selectContacts = (state) => state.contactsData.contacts.items;
-export const contactsReducer = contactsSlice.reducer;
-export const { addContact, deleteContact } = contactsSlice.actions;
+export default contactsSlice.reducer;
+
+// Селектори
+export const selectContacts = (state) => state.contacts.items;
+export const selectLoading = (state) => state.contacts.loading;
+export const selectError = (state) => state.contacts.error;
+
+// Мемоізований селектор для фільтрації
+export const selectFilteredContacts = createSelector(
+  [selectContacts, selectNameFilter],
+  (contacts, filter) => {
+    return contacts.filter((contact) =>
+      contact.name.toLowerCase().includes(filter.toLowerCase())
+    );
+  }
+);

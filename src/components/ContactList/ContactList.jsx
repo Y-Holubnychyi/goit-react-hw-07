@@ -1,27 +1,10 @@
-import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import Contact from "../Contact/Contact";
-import Loader from "../Loader/Loader";
 import s from "./ContactList.module.css";
-import { selectContacts } from "../../redux/contactsSlice";
+import { selectFilteredContacts } from "../../redux/contactsSlice";
 
 const ContactList = () => {
-  const contacts = useSelector(selectContacts);
-  const selectNameFilter = useSelector((state) => state.filter.filters.name);
-
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (isLoading) {
-    return <Loader />;
-  }
+  const contacts = useSelector(selectFilteredContacts);
 
   if (!contacts || contacts.length === 0) {
     return (
@@ -31,13 +14,9 @@ const ContactList = () => {
     );
   }
 
-  const filteredUsers = contacts.filter((user) =>
-    user.name.toLowerCase().includes(selectNameFilter.toLowerCase().trim())
-  );
-
   return (
     <ul className={s.contactList}>
-      {filteredUsers.map(({ id, name, number }) => (
+      {contacts.map(({ id, name, number }) => (
         <li key={id} className={s.contactItem}>
           <Contact id={id} name={name} number={number} />
         </li>
