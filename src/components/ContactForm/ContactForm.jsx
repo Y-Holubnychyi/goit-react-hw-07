@@ -1,7 +1,8 @@
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as yup from "yup";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addContact } from "../../redux/contactsOps";
+import { selectContacts } from "../../redux/contactsSlice";
 import s from "./ContactForm.module.css";
 
 const addProfileSchema = yup.object({
@@ -25,8 +26,19 @@ const initialValues = {
 
 const ContactForm = () => {
   const dispatch = useDispatch();
+  const contacts = useSelector(selectContacts);
 
   const onAddProfile = (formData, actions) => {
+    const isDuplicate = contacts.some(
+      (contact) =>
+        contact.name.trim().toLowerCase() === formData.name.trim().toLowerCase()
+    );
+
+    if (isDuplicate) {
+      alert(`${formData.name} is already in contacts.`);
+      return;
+    }
+
     dispatch(addContact(formData));
     actions.resetForm();
   };

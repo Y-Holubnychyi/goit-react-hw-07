@@ -1,5 +1,5 @@
 import { useDispatch } from "react-redux";
-import { deleteContact } from "../../redux/contactsOps"; // імпортуємо з contactsOps
+import { deleteContact } from "../../redux/contactsOps";
 import { FaUser, FaPhone } from "react-icons/fa";
 import s from "./Contact.module.css";
 
@@ -7,7 +7,7 @@ function Contact({ name, number, id }) {
   const dispatch = useDispatch();
 
   const onDeleteProfile = () => {
-    dispatch(deleteContact(id)); // викликаємо асинхронну дію для видалення
+    dispatch(deleteContact(id));
   };
 
   return (

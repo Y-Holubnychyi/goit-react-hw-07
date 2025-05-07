@@ -47,7 +47,7 @@ const contactsSlice = createSlice({
         state.loading = false;
         state.error = null;
         state.items = state.items.filter(
-          (contact) => contact.id !== action.payload.id // id приходит в payload
+          (contact) => contact.id !== action.payload.id
         );
       })
       .addCase(deleteContact.rejected, (state, action) => {
@@ -59,12 +59,10 @@ const contactsSlice = createSlice({
 
 export default contactsSlice.reducer;
 
-// Селектори
 export const selectContacts = (state) => state.contacts.items;
 export const selectLoading = (state) => state.contacts.loading;
 export const selectError = (state) => state.contacts.error;
 
-// Мемоізований селектор для фільтрації
 export const selectFilteredContacts = createSelector(
   [selectContacts, selectNameFilter],
   (contacts, filter) => {
